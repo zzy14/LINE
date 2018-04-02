@@ -18,7 +18,7 @@ Publication: Jian Tang, Meng Qu, Mingzhe Wang, Ming Zhang, Jun Yan, Qiaozhu Mei.
 #include <string.h>
 #include <math.h>
 #include <pthread.h>
-#include <gsl/gsl_rng.h>
+#include <random>
 
 
 #define MAX_STRING 100
@@ -51,9 +51,6 @@ double *edge_weight;
 // Parameters for edge sampling
 long long *alias;
 double *prob;
-
-const gsl_rng_type * gsl_T;
-gsl_rng * gsl_r;
 
 /* Build a hash table, mapping each vertex name to a unique vertex id */
 unsigned int Hash(char *key)
@@ -305,6 +302,9 @@ void *TrainLINEThread(void *id)
 	long long u, v, lu, lv, target, label;
 	long long count = 0, last_count = 0, curedge;
 	unsigned long long seed = (long long)id;
+	std::tr1::mt19937 eng;
+	eng.seed(id)
+	std::tr1::uniform_real<double> uni();
 	real *vec_error = (real *)calloc(dim, sizeof(real));
 
 	while (1)
@@ -322,7 +322,7 @@ void *TrainLINEThread(void *id)
 			if (rho < init_rho * 0.0001) rho = init_rho * 0.0001;
 		}
 
-		curedge = SampleAnEdge(gsl_rng_uniform(gsl_r), gsl_rng_uniform(gsl_r));
+		curedge = SampleAnEdge(uni(eng), uni(eng));
 		u = edge_source_id[curedge];
 		v = edge_target_id[curedge];
 
@@ -392,10 +392,6 @@ void TrainLINE() {
 	InitNegTable();
 	InitSigmoidTable();
 
-	gsl_rng_env_setup();
-	gsl_T = gsl_rng_rand48;
-	gsl_r = gsl_rng_alloc(gsl_T);
-	gsl_rng_set(gsl_r, 314159265);
 
 	clock_t start = clock();
 	printf("--------------------------------\n");
