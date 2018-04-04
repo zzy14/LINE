@@ -1,4 +1,4 @@
-#include   "RandNum.h"  
+#include   "randnum.h"  
 #ifndef    INCLUDE_ALGORITHM  
 #define    INCLUDE_ALGORITHM  
 #include   <algorithm>  
